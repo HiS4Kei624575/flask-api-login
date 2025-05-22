@@ -16,7 +16,7 @@ API_KEY = "supersecretkey"
 
 # Modèle utilisateur
 class User(db.Model):
-    __tablename__ = "users"  # correction ici
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     pseudo = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
@@ -24,6 +24,12 @@ class User(db.Model):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+# Crée ou recrée la base au premier appel
+@app.before_first_request
+def create_tables():
+    db.drop_all()
+    db.create_all()
 
 # Route pour l'admin : ajouter un utilisateur
 @app.route('/add_user', methods=['POST'])
