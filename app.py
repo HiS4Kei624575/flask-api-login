@@ -27,9 +27,9 @@ class User(db.Model):
 # Route pour l'admin : ajouter un utilisateur
 @app.route('/add_user', methods=['POST'])
 def add_user():
-    # Vérifie la clé API dans l'en-tête
-    auth_header = request.headers.get("Authorization")
-    if auth_header != API_KEY:
+    # Vérifie la clé API dans l'en-tête (type Bearer)
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer ") or auth_header.split(" ")[1] != API_KEY:
         return jsonify({"error": "Clé API invalide"}), 401
 
     data = request.get_json()
