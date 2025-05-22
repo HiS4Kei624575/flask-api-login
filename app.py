@@ -25,13 +25,7 @@ class User(db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-# Crée ou recrée la base au premier appel
-@app.before_first_request
-def create_tables():
-    db.drop_all()
-    db.create_all()
-
-# Route pour l'admin : ajouter un utilisateur
+# Route pour ajouter un utilisateur
 @app.route('/add_user', methods=['POST'])
 def add_user():
     auth_header = request.headers.get("Authorization")
@@ -75,7 +69,7 @@ def login():
 
     return jsonify({"message": "Connexion réussie"})
 
-# Page d'accueil
+# Route d'accueil
 @app.route('/')
 def index():
     return jsonify({"message": "API Flask opérationnelle"}), 200
