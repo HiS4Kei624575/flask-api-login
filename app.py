@@ -33,7 +33,7 @@ def login():
     if not check_password_hash(user.password, password):
         return jsonify({'success': False, 'message': 'Mot de passe incorrect'}), 401
 
-    if datetime.utcnow() > user.expiration_date:
+    if datetime.utcnow().date() > user.expiration_date:
         return jsonify({'success': False, 'message': 'Abonnement expiré'}), 403
 
     return jsonify({'success': True, 'message': 'Connexion réussie'}), 200
