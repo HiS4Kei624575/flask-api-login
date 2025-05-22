@@ -16,6 +16,7 @@ API_KEY = "supersecretkey"
 
 # Modèle utilisateur
 class User(db.Model):
+    __tablename__ = "users"  # correction ici
     id = db.Column(db.Integer, primary_key=True)
     pseudo = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
@@ -27,9 +28,8 @@ class User(db.Model):
 # Route pour l'admin : ajouter un utilisateur
 @app.route('/add_user', methods=['POST'])
 def add_user():
-    # Vérifie la clé API dans l'en-tête (type Bearer)
-    auth_header = request.headers.get("Authorization", "")
-    if not auth_header.startswith("Bearer ") or auth_header.split(" ")[1] != API_KEY:
+    auth_header = request.headers.get("Authorization")
+    if auth_header != "Bearer " + API_KEY:
         return jsonify({"error": "Clé API invalide"}), 401
 
     data = request.get_json()
@@ -69,7 +69,7 @@ def login():
 
     return jsonify({"message": "Connexion réussie"})
 
-# Page d'accueil par défaut
+# Page d'accueil
 @app.route('/')
 def index():
     return jsonify({"message": "API Flask opérationnelle"}), 200
