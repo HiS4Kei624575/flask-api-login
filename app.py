@@ -6,12 +6,12 @@ import os
 
 app = Flask(__name__)
 
-# Configuration base de données PostgreSQL (Render)
+# Configuration de la base PostgreSQL (Render)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "postgresql://wov_86f2_user:HgvtrT67LVgNYlIEkhARo93c7vnF6nCt@dpg-d0nnt9adbo4c73ccput0-a.frankfurt-postgres.render.com/wov_86f2")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Clé API (à sécuriser plus tard)
+# Clé API pour l'ajout de compte
 API_KEY = "supersecretkey"
 
 # Modèle utilisateur
@@ -50,7 +50,7 @@ def add_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Route de login
+# Route de login (renvoie aussi la date d'expiration)
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -67,12 +67,18 @@ def login():
     if datetime.utcnow().date() > user.expiration_date:
         return jsonify({"error": "Abonnement expiré"}), 403
 
-    return jsonify({"message": "Connexion réussie"})
+    return jsonify({
+        "message": "Connexion réussie",
+        "expiration": user.expiration_date.strftime("%Y-%m-%d")
+    })
 
 # Route d'accueil
 @app.route('/')
 def index():
     return jsonify({"message": "API Flask opérationnelle"}), 200
 
+# Lancement local (non utilisé sur Render, mais pratique pour test local)
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # S'assure que la table existe
     app.run(debug=True)
